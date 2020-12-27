@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">GSpace</string>
+    <string name="Dagıtılacak_Puan">Dağıtılacak Puan:</string>
+    <string name="Dayaniklilik">Dayanıklılık</string>
+    <string name="Kapasite">Kapasite</string>
+    <string name="Hiz">Hız</string>
+    <string name="Favoriler">Favoriler</string>
+</resources>
