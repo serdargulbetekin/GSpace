@@ -1,16 +1,17 @@
 package com.example.gspace.modules.createspaceship
 
 import android.app.Application
+import android.content.Context
 import com.example.gspace.modules.createspaceship.room.SpaceShipDao
 import com.example.gspace.modules.createspaceship.room.SpaceShipDatabase
 import com.example.gspace.modules.createspaceship.room.SpaceShipEntity
 
-class CreateSpaceShipRepo(application: Application) {
+class CreateSpaceShipRepo(context: Context) {
 
     private var dao: SpaceShipDao? = null
 
     init {
-        val db = SpaceShipDatabase.invoke(application)
+        val db = SpaceShipDatabase.invoke(context)
         dao = db.spaceShipDao()
     }
 

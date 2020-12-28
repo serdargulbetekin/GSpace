@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gspace.databinding.RowFavoritesBinding
+import com.example.gspace.modules.station.room.StationEntity
 
-class FavoritesAdapter : RecyclerView.Adapter<FavoritesViewHolder>() {
+class FavoritesAdapter(private val onImageViewClick: (StationEntity) -> Unit) :
+    RecyclerView.Adapter<FavoritesViewHolder>() {
 
-    var items: List<String> = mutableListOf()
+    var items: List<StationEntity> = mutableListOf()
         set(value) {
             (field as? MutableList)?.apply {
                 clear()
@@ -23,7 +25,7 @@ class FavoritesAdapter : RecyclerView.Adapter<FavoritesViewHolder>() {
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: FavoritesViewHolder, position: Int) {
-        holder.bindItem(items[position])
+        holder.bindItem(items[position], onImageViewClick)
     }
 
 
@@ -32,7 +34,15 @@ class FavoritesAdapter : RecyclerView.Adapter<FavoritesViewHolder>() {
 class FavoritesViewHolder(private val binding: RowFavoritesBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    fun bindItem(item: String) {
+    fun bindItem(item: StationEntity, onImageViewClick: (StationEntity) -> Unit) {
+        binding.apply {
+            textViewStationName.text = item.name
+            textViewStationEus.text = item.capacity.toString()
+            imageViewStar.setOnClickListener {
+                onImageViewClick.invoke(item)
+
+            }
+        }
 
     }
 

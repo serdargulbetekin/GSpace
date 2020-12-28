@@ -1,12 +1,15 @@
 package com.example.gspace.di
 
 
-import android.app.Application
 import android.content.Context
 import com.example.gspace.api.RestApi
 import com.example.gspace.constant.URL_WEB
 import com.example.gspace.modules.createspaceship.CreateSpaceShipRepo
-import com.example.gspace.repo.GSpaceRepo
+import com.example.gspace.modules.createspaceship.room.SpaceShipDao
+import com.example.gspace.modules.createspaceship.room.SpaceShipDatabase
+import com.example.gspace.modules.station.StationRepo
+import com.example.gspace.modules.station.room.StationDao
+import com.example.gspace.modules.station.room.StationDatabase
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -14,15 +17,18 @@ import io.reactivex.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, NetModule::class])
+@Component(modules = [AppModule::class, NetModule::class, StationRepoModule::class, CreateShipRepoModule::class])
 @AppScope
 interface AppComponent {
     fun getContext(): Context
     fun getApiInterface(): RestApi
     fun getRetrofit(): Retrofit
     fun getCreateShipRepo(): CreateSpaceShipRepo
-    fun getGSpaceRepo(): GSpaceRepo
+    fun getStationRepo(): StationRepo
+    fun getSpaceShipDao(): SpaceShipDao
+    fun getStationDao(): StationDao
 
 }
 
@@ -40,13 +46,33 @@ class AppModule(private val context: Context) {
         return context
     }
 
+}
+
+@Module
+class StationRepoModule {
     @Provides
-    @AppScope
-    fun provideCreateShipRepo(application: Application) = CreateSpaceShipRepo(application)
+    fun provideStationRepo(restApi: RestApi) =
+        StationRepo(restApi)
 
     @Provides
-    @AppScope
-    fun provideGSpaceRepo(restApi: RestApi) = GSpaceRepo(restApi)
+    fun provideStationDB(context: Context) = StationDatabase.invoke(context)
+
+    @Provides
+    fun provideStationDao(stationDatabase: StationDatabase) = stationDatabase.stationDao()
+
+}
+
+@Module
+class CreateShipRepoModule {
+    @Provides
+    fun provideCreateShipRepo(context: Context) = CreateSpaceShipRepo(context)
+
+    @Provides
+    fun provideSpaceShipDB(context: Context) = SpaceShipDatabase.invoke(context)
+
+    @Provides
+    fun provideStationDao(spaceShipDatabase: SpaceShipDatabase) = spaceShipDatabase.spaceShipDao()
+
 }
 
 @Module

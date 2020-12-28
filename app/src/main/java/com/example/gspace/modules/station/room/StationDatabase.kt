@@ -1,26 +1,27 @@
-package com.example.gspace.modules.createspaceship.room
+package com.example.gspace.modules.station.room
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [SpaceShipEntity::class], version = 1)
-abstract class SpaceShipDatabase : RoomDatabase() {
-    abstract fun spaceShipDao(): SpaceShipDao
+@Database(entities = [StationEntity::class], version = 1)
+abstract class StationDatabase : RoomDatabase() {
+    abstract fun stationDao(): StationDao
 
     companion object {
-
         @Volatile
-        private var instance: SpaceShipDatabase? = null
+        private var instance: StationDatabase? = null
 
         private val LOCK = Any()
+
 
         operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
             instance ?: buildRoomDatabase(context).also { instance = it }
         }
 
         private fun buildRoomDatabase(context: Context) =
-            Room.databaseBuilder(context, SpaceShipDatabase::class.java, "space_ship.db").build()
+            Room.databaseBuilder(context, StationDatabase::class.java, "station.db").build()
+
     }
 }

@@ -15,8 +15,7 @@ interface SpaceShipDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updateSpaceship(spaceShipEntity: SpaceShipEntity)
 
-    @DELETE
+    @Delete
     fun deleteSpaceShip(spaceShipEntity: SpaceShipEntity)
-
 
 }

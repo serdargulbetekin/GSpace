@@ -1,17 +1,19 @@
-package com.example.gspace.modules.main
+package com.example.gspace.modules.station
 
 import com.example.gspace.api.RestApi
+import com.example.gspace.modules.station.room.StationEntity
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.ResponseBody
 import org.json.JSONArray
 
-class MainActivityViewModelRepo(
+class StationRepo(
     private val restApi: RestApi
 ) {
 
-    fun singleStations(): Single<List<GSpaceStation>> {
+    fun singleStations(): Observable<List<StationEntity>> {
         return restApi.getStations()
             .map {
                 parseStations(it)
@@ -20,14 +22,14 @@ class MainActivityViewModelRepo(
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    private fun parseStations(responseBody: ResponseBody): List<GSpaceStation> {
-        val spaceStationList = mutableListOf<GSpaceStation>()
+    private fun parseStations(responseBody: ResponseBody): List<StationEntity> {
+        val spaceStationList = mutableListOf<StationEntity>()
         val jsonArray = JSONArray(responseBody.string())
 
         for (x in 0 until jsonArray.length()) {
             val jsonObjectData = jsonArray.getJSONObject(x)
             spaceStationList.add(
-                GSpaceStation(
+                StationEntity(
                     name = jsonObjectData.optString("name"),
                     coordinateX = jsonObjectData.optDouble("coordinateX"),
                     coordinateY = jsonObjectData.optDouble("coordinateY"),
@@ -41,11 +43,3 @@ class MainActivityViewModelRepo(
     }
 }
 
-data class GSpaceStation(
-    val name: String,
-    val coordinateX: Double,
-    val coordinateY: Double,
-    val capacity: Int,
-    val stock: Int,
-    val need: Int
-)
