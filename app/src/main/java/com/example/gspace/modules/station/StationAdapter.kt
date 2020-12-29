@@ -2,6 +2,8 @@ package com.example.gspace.modules.station
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gspace.R
 import com.example.gspace.databinding.RowStationBinding
@@ -11,16 +13,20 @@ class StationAdapter(
     private val onImageViewClick: (StationEntity) -> Unit,
     private val onTextViewTravelClick: (StationEntity) -> Unit
 ) :
-    RecyclerView.Adapter<StationViewHolder>() {
+    RecyclerView.Adapter<StationViewHolder>(), Filterable {
 
-    var items: List<StationAdapterItem> = mutableListOf()
-        set(value) {
-            (field as? MutableList)?.apply {
-                clear()
-                addAll(value)
-            }
-            notifyDataSetChanged()
-        }
+
+    private val allItems = mutableListOf<StationAdapterItem>()
+    private val items = mutableListOf<StationAdapterItem>()
+
+
+    fun updateList(cryptoCoin: List<StationAdapterItem>) {
+        items.clear()
+        items.addAll(cryptoCoin)
+        allItems.addAll(cryptoCoin)
+        notifyDataSetChanged()
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StationViewHolder {
         return StationViewHolder(
@@ -36,6 +42,40 @@ class StationAdapter(
 
     override fun onBindViewHolder(holder: StationViewHolder, position: Int) {
         holder.bindItem(items[position], onImageViewClick, onTextViewTravelClick)
+    }
+
+    override fun getFilter(): Filter {
+        return filter
+    }
+
+    private val filter = object : Filter() {
+        override fun performFiltering(charSequence: CharSequence?): FilterResults {
+            val filteredList = mutableListOf<StationAdapterItem>()
+            if (charSequence.toString().isEmpty()) {
+                filteredList.addAll(allItems)
+            } else {
+                allItems.forEach {
+                    if (it.stationEntity.name.toLowerCase().contains(
+                            charSequence.toString().toLowerCase()
+                        )
+                    ) {
+                        filteredList.add(it)
+                    }
+                }
+
+            }
+            val filterResults = FilterResults()
+            filterResults.values = filteredList
+            return filterResults
+
+        }
+
+        override fun publishResults(p0: CharSequence?, filterResults: FilterResults?) {
+            items.clear()
+            items.addAll(filterResults?.values as List<StationAdapterItem>)
+            notifyDataSetChanged()
+        }
+
     }
 
 }

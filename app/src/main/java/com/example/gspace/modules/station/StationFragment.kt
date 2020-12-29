@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -43,9 +44,13 @@ class StationFragment : Fragment() {
             recyclerView.layoutManager =
                 LinearLayoutManager(this@StationFragment.context)
             recyclerView.adapter = adapter
+
+            editTextSearch.addTextChangedListener {
+                adapter.filter.filter(it.toString())
+            }
         }
         viewModel.stationList.observe(viewLifecycleOwner, Observer {
-            adapter.items = it
+            adapter.updateList(it)
         })
 
         viewModel.spaceShip.observe(viewLifecycleOwner, Observer {
