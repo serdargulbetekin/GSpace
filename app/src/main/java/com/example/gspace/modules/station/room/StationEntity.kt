@@ -12,6 +12,7 @@ data class StationEntity(
     val coordinateY: Double,
     val capacity: Int,
     val stock: Int,
-    val need: Int
+    val need: Int,
+    var distance:Double=0.0
 )
 

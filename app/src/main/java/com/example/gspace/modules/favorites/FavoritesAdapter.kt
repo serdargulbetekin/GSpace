@@ -36,14 +36,13 @@ class FavoritesViewHolder(private val binding: RowFavoritesBinding) :
 
     fun bindItem(item: StationEntity, onImageViewClick: (StationEntity) -> Unit) {
         binding.apply {
-            textViewStationName.text = item.name
+            textViewStationName.text = item.name + " - " + item.distance
             textViewStationEus.text = item.capacity.toString()
             imageViewStar.setOnClickListener {
                 onImageViewClick.invoke(item)
 
             }
         }
-
     }
 
 }

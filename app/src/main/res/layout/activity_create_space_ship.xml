@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,11 +75,30 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
-        <SeekBar
-            android:id="@+id/seekBar_endurance"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp" />
+            android:layout_height="wrap_content">
+
+            <SeekBar
+                android:id="@+id/seekBar_endurance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/textViewEndurance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_price_to_distribute_black_border"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:textColor="@color/black"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="15" />
+
+        </LinearLayout>
 
 
         <TextView
@@ -89,11 +110,30 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
-        <SeekBar
-            android:id="@+id/seekBar_velocity"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp" />
+            android:layout_height="wrap_content">
+
+            <SeekBar
+                android:id="@+id/seekBar_velocity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/textView_velocity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_price_to_distribute_black_border"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:textColor="@color/black"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="15" />
+
+        </LinearLayout>
 
 
         <TextView
@@ -105,15 +145,37 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
-        <SeekBar
-            android:id="@+id/seekBar_capacity"
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp" />
+            android:layout_height="wrap_content">
+
+            <SeekBar
+                android:id="@+id/seekBar_capacity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/textView_capacity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_price_to_distribute_black_border"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:textColor="@color/black"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="15" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
     <TextView
+        android:id="@+id/textView_continue"
         style="@style/GSpaceButton"
         android:layout_margin="15dp"
         android:text="Devam Et" />

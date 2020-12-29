@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.gspace.modules.station.room.StationDao
 import com.example.gspace.modules.station.room.StationEntity
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -43,7 +42,11 @@ class FavoritesViewModel @Inject constructor(private val stationDao: StationDao)
     fun deleteStationEntity(stationEntity: StationEntity) {
         Single.fromCallable {
             stationDao.deleteStation(stationEntity)
-        }.subscribeOn(Schedulers.io())
+        }.flatMap {
+                Single.fromCallable {
+                    getFavList()
+                }
+            }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 Log.d("Serdar: ", "Deleted")

@@ -8,12 +8,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.ResponseBody
 import org.json.JSONArray
+import kotlin.math.pow
 
 class StationRepo(
     private val restApi: RestApi
 ) {
 
-    fun singleStations(): Observable<List<StationEntity>> {
+    fun singleStations(): Single<List<StationEntity>> {
         return restApi.getStations()
             .map {
                 parseStations(it)
@@ -39,7 +40,31 @@ class StationRepo(
                 )
             )
         }
+        val world = spaceStationList.firstOrNull { it.name == "Dünya" }
+        val distanceMap = mutableMapOf<String, Double>()
+        spaceStationList.forEach {
+            val distance = calculateDistance(
+                world?.coordinateX ?: 0.0,
+                world?.coordinateY ?: 0.0,
+                it.coordinateX,
+                it.coordinateY
+            )
+            distanceMap[it.name] = distance
+        }
+        spaceStationList.forEach {
+            it.distance = distanceMap[it.name] ?: 0.0
+
+        }
         return spaceStationList.toList()
+    }
+
+    private fun calculateDistance(
+        coorX1: Double,
+        coorY1: Double,
+        coorX2: Double,
+        coorY2: Double
+    ): Double {
+        return (coorX1 - coorX2).pow(2) + (coorY1 - coorY2).pow(2)
     }
 }
 
