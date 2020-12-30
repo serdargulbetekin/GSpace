@@ -2,7 +2,6 @@ package com.example.gspace.modules.station
 
 import com.example.gspace.api.RestApi
 import com.example.gspace.modules.station.room.StationEntity
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -14,7 +13,7 @@ class StationRepo(
     private val restApi: RestApi
 ) {
 
-    fun singleStations(): Single<List<StationEntity>> {
+    fun singleStations(): Single<Pair<List<StationEntity>, StationEntity?>> {
         return restApi.getStations()
             .map {
                 parseStations(it)
@@ -23,7 +22,7 @@ class StationRepo(
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    private fun parseStations(responseBody: ResponseBody): List<StationEntity> {
+    private fun parseStations(responseBody: ResponseBody): Pair<List<StationEntity>, StationEntity?> {
         val spaceStationList = mutableListOf<StationEntity>()
         val jsonArray = JSONArray(responseBody.string())
 
@@ -53,12 +52,11 @@ class StationRepo(
         }
         spaceStationList.forEach {
             it.distance = distanceMap[it.name] ?: 0.0
-
         }
-        return spaceStationList.toList()
+        return spaceStationList.toList() to world
     }
 
-    private fun calculateDistance(
+     fun calculateDistance(
         coorX1: Double,
         coorY1: Double,
         coorX2: Double,

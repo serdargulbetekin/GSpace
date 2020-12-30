@@ -1,9 +1,11 @@
 package com.example.gspace.modules.station
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gspace.R
 import com.example.gspace.databinding.RowStationBinding
@@ -23,6 +25,7 @@ class StationAdapter(
     fun updateList(cryptoCoin: List<StationAdapterItem>) {
         items.clear()
         items.addAll(cryptoCoin)
+        allItems.clear()
         allItems.addAll(cryptoCoin)
         notifyDataSetChanged()
     }
@@ -83,12 +86,14 @@ class StationAdapter(
 class StationViewHolder(private val binding: RowStationBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
+    @SuppressLint("SetTextI18n")
     fun bindItem(
         stationAdapterItem: StationAdapterItem,
         onImageViewClick: (StationEntity) -> Unit,
         onTextViewTravelClick: (StationEntity) -> Unit
     ) {
-        binding.textViewName.text = stationAdapterItem.stationEntity.name
+        binding.textViewName.text =
+            stationAdapterItem.stationEntity.name + " - " + stationAdapterItem.stationEntity.distance
         binding.textViewPoint.text = stationAdapterItem.stationEntity.capacity.toString()
         binding.imageViewFav.setOnClickListener {
             onImageViewClick.invoke(stationAdapterItem.stationEntity)
@@ -102,12 +107,18 @@ class StationViewHolder(private val binding: RowStationBinding) :
             binding.imageViewFav.setImageResource(R.drawable.icon_fav)
         } else {
             binding.imageViewFav.setImageResource(R.drawable.icon_fav_empty)
+        }
 
+        if (stationAdapterItem.isCurrent) {
+            binding.root.setBackgroundResource(R.drawable.selector_price_to_distribute_green_border)
+        } else {
+            binding.root.setBackgroundResource(R.drawable.selector_price_to_distribute_black_border)
         }
     }
 }
 
 data class StationAdapterItem(
     val stationEntity: StationEntity,
-    val hasStation: Boolean
+    val hasStation: Boolean,
+    val isCurrent: Boolean = false
 )

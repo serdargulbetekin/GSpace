@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,7 +24,13 @@ class StationFragment : Fragment() {
                 viewModel.onImageViewClick(it)
             },
             onTextViewTravelClick = {
-                viewModel.onTextViewTravelClick(it)
+                viewModel.onTextViewTravelClick(it) {
+                    Toast.makeText(
+                        this.context,
+                        "You are already in this station.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             })
     }
     private val factory by lazy { Factory() }
@@ -55,6 +62,10 @@ class StationFragment : Fragment() {
 
         viewModel.spaceShip.observe(viewLifecycleOwner, Observer {
             viewBinding.textViewStationName.text = it?.name ?: ""
+        })
+
+        viewModel.currentStation.observe(viewLifecycleOwner, Observer {
+            viewBinding.textViewBottom.text = it?.name
         })
     }
 }

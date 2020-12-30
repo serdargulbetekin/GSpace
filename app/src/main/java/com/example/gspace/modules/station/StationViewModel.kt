@@ -1,7 +1,6 @@
 package com.example.gspace.modules.station
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,6 +20,11 @@ class StationViewModel @Inject constructor(
     private val spaceShipDao: SpaceShipDao
 ) : ViewModel() {
 
+
+    private var ugs = 0
+    private var eus = 0
+    private var ds = 0
+
     private val _stationListMutableLiveData = MutableLiveData<List<StationAdapterItem>>()
 
     val stationList: LiveData<List<StationAdapterItem>>
@@ -31,40 +35,59 @@ class StationViewModel @Inject constructor(
     val spaceShip: LiveData<SpaceShipEntity?>
         get() = _spaceship
 
+    private val _currentStation = MutableLiveData<StationEntity?>()
+
+    val currentStation: LiveData<StationEntity?>
+        get() = _currentStation
+
+    private val stationEntityList = mutableListOf<StationEntity>()
+
     init {
         requestStations()
     }
 
+    private val distanceMap = mutableMapOf<String, Double>()
+    private val hasItemList = mutableListOf<Boolean>()
+
     @SuppressLint("CheckResult")
     fun requestStations() {
         Singles.zip(
-            Single.fromCallable { spaceShipDao.getSpaceShipList() }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()),
-            stationRepo.singleStations().flatMap {
-                val hasItemList = mutableListOf<Boolean>()
+            Single.fromCallable { spaceShipDao.getSpaceShipList() }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()),
+            stationRepo.singleStations().flatMap { pairStation ->
                 Single.fromCallable {
-                    it.forEach {
+                    pairStation.first.forEach {
                         if (stationDao.getStation(it.name) != null) {
                             hasItemList.add(true)
                         } else {
                             hasItemList.add(false)
                         }
                     }
-                    it to hasItemList.toList()
+                    Triple(pairStation.first, hasItemList.toList(), pairStation.second)
                 }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             }
-        ) { spaceShipList, pair ->
-            spaceShipList to pair
+        ) { spaceShipList, triple ->
+            spaceShipList to triple
         }.map {
+
+            val spaceShipEntityList = it.first
+            val stationEntityList = it.second.first
+            val hasFavList = it.second.second
+            this._currentStation.postValue(it.second.third)
+
+            this.stationEntityList.addAll(stationEntityList)
+
             val adapterItemList = mutableListOf<StationAdapterItem>()
-            it.second.first.forEachIndexed { index, stationEntity ->
+            stationEntityList.forEachIndexed { index, stationEntity ->
                 adapterItemList.add(
                     StationAdapterItem(
                         stationEntity,
-                        it.second.second[index]
+                        hasFavList[index],
+                        isCurrent = index == 0
                     )
                 )
             }
-            adapterItemList to it.first.lastOrNull()
+            adapterItemList to spaceShipEntityList.lastOrNull()
         }
             .subscribe({
                 _stationListMutableLiveData.postValue(it.first)
@@ -74,31 +97,90 @@ class StationViewModel @Inject constructor(
             })
     }
 
+    private fun singleFavList(): Single<Pair<List<StationEntity>, List<Boolean>>> {
+        hasItemList.clear()
+        return Single.fromCallable {
+            stationEntityList.forEach {
+                if (stationDao.getStation(it.name) != null) {
+                    hasItemList.add(true)
+                } else {
+                    hasItemList.add(false)
+                }
+            }
+            stationEntityList.toList() to hasItemList.toList()
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+    }
+
     @SuppressLint("CheckResult")
     fun onImageViewClick(stationEntity: StationEntity) {
         Single.fromCallable {
             val station = stationDao.getStation(stationEntity.name)
-
             if (station != null) {
                 stationDao.deleteStation(stationEntity)
             } else {
                 stationDao.insertStation(stationEntity)
             }
-
-        }.flatMap {
-            Single.fromCallable {
-                requestStations()
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).flatMap {
+            singleFavList().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        }.map {
+            val adapterItemList = mutableListOf<StationAdapterItem>()
+            stationEntityList.forEachIndexed { index, stationEntity ->
+                adapterItemList.add(
+                    StationAdapterItem(
+                        stationEntity,
+                        it.second[index],
+                        isCurrent = currentStation.value?.name == stationEntity.name
+                    )
+                )
             }
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
-            Log.d("Serdar", "ASLKFASFLA")
-
+            adapterItemList.toList()
+        }.subscribe({
+            _stationListMutableLiveData.postValue(it)
         }, {
-            Log.d("Serdar", it.message.toString())
+            _stationListMutableLiveData.postValue(null)
         })
 
     }
 
-    fun onTextViewTravelClick(stationEntity: StationEntity) {
+    fun onTextViewTravelClick(stationEntity: StationEntity, onCurrentStationError: () -> Unit) {
+        if (currentStation.value?.name == stationEntity.name) {
+            onCurrentStationError.invoke()
+        } else {
+            this._currentStation.postValue(stationEntity)
+            val stationAdapterItemList = mutableListOf<StationAdapterItem>()
+
+            stationEntityList.forEachIndexed { index, stationEntityItem ->
+                stationAdapterItemList.add(
+                    StationAdapterItem(
+                        StationEntity(
+                            name = stationEntityItem.name,
+                            coordinateX = stationEntityItem.coordinateX,
+                            coordinateY = stationEntityItem.coordinateY,
+                            capacity = stationEntityItem.capacity,
+                            stock = stationEntityItem.stock,
+                            need = stationEntityItem.need,
+                            distance = stationRepo.calculateDistance(
+                                stationEntity.coordinateX,
+                                stationEntity.coordinateY,
+                                stationEntityItem.coordinateX,
+                                stationEntityItem.coordinateY
+                            )
+                        ), hasItemList[index],
+                        isCurrent = stationEntityItem.name == stationEntity.name
+                    )
+                )
+            }
+
+            stationEntityList.clear()
+            stationAdapterItemList.forEach {
+                stationEntityList.add(it.stationEntity)
+
+            }
+
+            _stationListMutableLiveData.postValue(stationAdapterItemList)
+        }
 
     }
 
