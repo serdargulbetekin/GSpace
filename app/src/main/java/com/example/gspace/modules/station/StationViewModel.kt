@@ -118,7 +118,7 @@ class StationViewModel @Inject constructor(
         Single.fromCallable {
             val station = stationDao.getStation(stationEntity.name)
             if (station != null) {
-                stationDao.deleteStation(stationEntity)
+                stationDao.deleteWithName(stationEntity.name)
             } else {
                 stationDao.insertStation(stationEntity)
             }

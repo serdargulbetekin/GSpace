@@ -12,6 +12,9 @@ interface StationDao {
     @Query("SELECT * FROM station WHERE name==:name")
     fun getStation(name: String): StationEntity?
 
+    @Query("DELETE FROM station WHERE name==:name")
+    fun deleteWithName(name: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertStation(station: StationEntity)
 
