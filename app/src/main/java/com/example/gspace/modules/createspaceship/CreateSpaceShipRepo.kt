@@ -1,25 +1,17 @@
 package com.example.gspace.modules.createspaceship
 
-import android.app.Application
-import android.content.Context
-import com.example.gspace.modules.createspaceship.room.SpaceShipDao
-import com.example.gspace.modules.createspaceship.room.SpaceShipDatabase
+import com.example.gspace.application.AppConfig
 import com.example.gspace.modules.createspaceship.room.SpaceShipEntity
 
-class CreateSpaceShipRepo(context: Context) {
+class CreateSpaceShipRepo {
 
-    private var dao: SpaceShipDao? = null
+    private val dao by lazy { AppConfig.appComponent.getSpaceShipDao() }
 
-    init {
-        val db = SpaceShipDatabase.invoke(context)
-        dao = db.spaceShipDao()
-    }
+    fun getSpaceShip() = dao.getSpaceShipList()
 
-    fun getSpaceShip() = dao?.getSpaceShipList() ?: listOf()
+    fun insertSpaceShip(spaceShipEntity: SpaceShipEntity) = dao.insertSpaceship(spaceShipEntity)
 
-    fun insertSpaceShip(spaceShipEntity: SpaceShipEntity) = dao?.insertSpaceship(spaceShipEntity)
+    fun deleteSpaceShip(spaceShipEntity: SpaceShipEntity) = dao.deleteSpaceShip(spaceShipEntity)
 
-    fun deleteSpaceShip(spaceShipEntity: SpaceShipEntity) = dao?.deleteSpaceShip(spaceShipEntity)
-
-    fun updateSpaceShip(spaceShipEntity: SpaceShipEntity) = dao?.updateSpaceship(spaceShipEntity)
+    fun updateSpaceShip(spaceShipEntity: SpaceShipEntity) = dao.updateSpaceship(spaceShipEntity)
 }

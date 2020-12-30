@@ -32,11 +32,6 @@ interface AppComponent {
 
 }
 
-interface BaseAppComponentBuilder<out T, out K> {
-    fun appComponent(appComponent: AppComponent): T
-    fun build(): K
-}
-
 @Module
 class AppModule(private val context: Context) {
 
@@ -65,7 +60,7 @@ class StationRepoModule {
 @Module
 class CreateShipRepoModule {
     @Provides
-    fun provideCreateShipRepo(context: Context) = CreateSpaceShipRepo(context)
+    fun provideCreateShipRepo() = CreateSpaceShipRepo()
 
     @Provides
     fun provideSpaceShipDB(context: Context) = SpaceShipDatabase.invoke(context)

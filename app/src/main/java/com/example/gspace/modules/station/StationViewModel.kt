@@ -46,7 +46,6 @@ class StationViewModel @Inject constructor(
         requestStations()
     }
 
-    private val distanceMap = mutableMapOf<String, Double>()
     private val hasItemList = mutableListOf<Boolean>()
 
     @SuppressLint("CheckResult")
